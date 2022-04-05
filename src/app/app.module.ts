@@ -3,6 +3,8 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import {TuiRootModule} from "@taiga-ui/core";
+import {TuiTabsModule} from "@taiga-ui/kit";
 
 @NgModule({
   declarations: [
@@ -10,7 +12,9 @@ import { AppComponent } from './app.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    TuiRootModule,
+    TuiTabsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

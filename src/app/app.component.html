@@ -1,57 +1,75 @@
+<tui-root>
+  <div class="container">
 
-<div class="container">
+    <h1 class="title">{{title}}</h1>
 
-  <h1 class="title">{{title}}</h1>
+    <div class="tabs">
+      <tui-tabs [(activeItemIndex)]="activeItemIndex">
+        <button *ngFor="let tab of tabs" tuiTab>
+          {{tab}}
+        </button>
+      </tui-tabs>
+      <ng-container [ngSwitch]="activeItemIndex">
+        <ng-container *ngSwitchCase="0">
+          Content of Tab 1
+        </ng-container>
 
-  <div class="box">
-    <div class="box-navigator">
+        <ng-container *ngSwitchCase="1">
+          Content of Tab 2
+        </ng-container>
+      </ng-container>
+    </div>
+
+    <div class="box">
+      <div class="box-navigator">
         <div class="json-input">Json input</div>
         <!-- we can add this later with (click)="function() -->
         <!-- <div class="hash-input">Transaction Hash</div> -->
-    </div>
-    <!-- ace editor -->
-    <div
-      class="app-ace-editor"
-      #editor
-      style="width: 500px;height: 250px;"
-    ></div>
-
-    <div
-      class="button"
-      (click)="onClick()"
-    >
-      <div class="button-text">
-        Decode
       </div>
-    </div>
+      <!-- ace editor -->
+      <div
+        class="app-ace-editor"
+        #editor
+        style="width: 500px;height: 250px;"
+      ></div>
 
-  </div>
-  <div class="box-output" id="box-output">
-    <div class="data-title">
-      <div>Parsed data</div>
-    </div>
-    <div *ngIf="!!parsedData" class="json-output">
-      <div *ngFor="let item of parsedData; let i = index" class='wrap-collapsible'>
-        <input class='toggle' [attr.id]="'collapsible' + i" type='checkbox'>
-        <label [attr.for]="'collapsible' + i" class='lbl-toggle'> {{item.maker}} </label>
-        <div class='collapsible-content'>
-          <div class='content-inner'>
+      <div
+        class="button"
+        (click)="onClick()"
+      >
+        <div class="button-text">
+          Decode
+        </div>
+      </div>
 
-            <div class='from-token-box'>
-              <span class='from-token-box-top'>From Token</span>
-              <div class='from-token-box-inner'>
-                <span class='from-token-box-inner-left'> {{item.name}} </span>
-                <span class='from-token-box-inner-right'> {{item.makerAmount}} </span>
+    </div>
+    <div class="box-output" id="box-output">
+      <div class="data-title">
+        <div>Parsed data</div>
+      </div>
+      <div *ngIf="!!parsedData" class="json-output">
+        <div *ngFor="let item of parsedData; let i = index" class='wrap-collapsible'>
+          <input class='toggle' [attr.id]="'collapsible' + i" type='checkbox'>
+          <label [attr.for]="'collapsible' + i" class='lbl-toggle'> {{item.maker}} </label>
+          <div class='collapsible-content'>
+            <div class='content-inner'>
+
+              <div class='from-token-box'>
+                <span class='from-token-box-top'>From Token</span>
+                <div class='from-token-box-inner'>
+                  <span class='from-token-box-inner-left'> {{item.name}} </span>
+                  <span class='from-token-box-inner-right'> {{item.makerAmount}} </span>
+                </div>
+                <span class='from-token-box-bottom'> {{item.symbol}} </span>
               </div>
-              <span class='from-token-box-bottom'> {{item.symbol}} </span>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  </div>
 
 
 
-<router-outlet></router-outlet>
+  <router-outlet></router-outlet>
+</tui-root>

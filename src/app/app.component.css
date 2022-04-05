@@ -87,7 +87,9 @@ h1{
     font-size: 20px;
 }
 
-
+.tabs {
+  color: #fff;
+}
 
 
 .json-output{

@@ -17,6 +17,13 @@ export class AppComponent implements AfterViewInit {
 
   parsedData: any = null;
 
+  activeItemIndex = 0;
+
+  tabs = [
+    'Tab 1',
+    'Tab 2',
+  ];
+
   constructor() { }
 
   ngAfterViewInit() {
