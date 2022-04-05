@@ -1,10 +1,11 @@
 
-<div class="container"> 
+<div class="container">
 
   <h1 class="title">{{title}}</h1>
+
   <div class="box">
     <div class="box-navigator">
-        <div class="json-input">Json input</div> 
+        <div class="json-input">Json input</div>
         <!-- we can add this later with (click)="function() -->
         <!-- <div class="hash-input">Transaction Hash</div> -->
     </div>
@@ -29,11 +30,27 @@
     <div class="data-title">
       <div>Parsed data</div>
     </div>
-    <div class="json-output" id="json-output">
+    <div *ngIf="!!parsedData" class="json-output">
+      <div *ngFor="let item of parsedData; let i = index" class='wrap-collapsible'>
+        <input class='toggle' [attr.id]="'collapsible' + i" type='checkbox'>
+        <label [attr.for]="'collapsible' + i" class='lbl-toggle'> {{item.maker}} </label>
+        <div class='collapsible-content'>
+          <div class='content-inner'>
 
+            <div class='from-token-box'>
+              <span class='from-token-box-top'>From Token</span>
+              <div class='from-token-box-inner'>
+                <span class='from-token-box-inner-left'> {{item.name}} </span>
+                <span class='from-token-box-inner-right'> {{item.makerAmount}} </span>
+              </div>
+              <span class='from-token-box-bottom'> {{item.symbol}} </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+  </div>
 
 
 
