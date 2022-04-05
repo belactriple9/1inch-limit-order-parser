@@ -1,0 +1,111 @@
+/* You can add global styles to this file, and also import other style files */
+body{
+    background-color: #06070a;
+}
+
+
+/* source: https://www.digitalocean.com/community/tutorials/css-collapsible */
+input {
+    display: none;
+}
+
+.wrap-collapsible{
+    margin-top:10px;
+    margin-bottom:10px;
+}
+
+.lbl-toggle {
+    display: block;
+  
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 1rem;
+    /* text-transform: uppercase; */
+    text-align: center;
+  
+    padding: 1rem;
+  
+    color: #fff;
+    background: #182a44;
+  
+    cursor: pointer;
+  
+    border-radius: 10px;
+    transition: all 0.25s ease-out;
+  }
+  
+  .lbl-toggle:hover {
+    color: #4399ff;
+  }
+
+  .lbl-toggle::before {
+    content: ' ';
+    display: inline-block;
+  
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid currentColor;
+  
+    vertical-align: middle;
+    margin-right: .7rem;
+    transform: translateY(-2px);
+  
+    transition: transform .2s ease-out;
+  }
+
+  .collapsible-content .content-inner {
+    background: #273249;
+    border-bottom: 1px solid #37445a;
+  
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+    padding: .5rem 1rem;
+  }
+
+  .collapsible-content {
+    max-height: 0px;
+    overflow: hidden;
+  
+    transition: max-height .25s ease-in-out;
+  }
+
+  .toggle:checked + .lbl-toggle + .collapsible-content {
+    max-height: 100vh;
+  }
+
+  .toggle:checked + .lbl-toggle::before {
+    transform: rotate(90deg) translateX(-3px);
+  }
+  
+  .toggle:checked + .lbl-toggle {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .from-token-box{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 90%;
+    margin: 0 auto;
+    border: 1px solid #37445a;
+    border-radius: 10px;
+    padding: 10px;
+  }
+
+  .from-token-box:nth-child(1){ /* our first span */
+    width: 90%;
+    color: #44556f;
+  }
+
+  .from-token-box-inner{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+    color: white;
+  }

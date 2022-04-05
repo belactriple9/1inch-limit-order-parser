@@ -1,0 +1,40 @@
+
+<div class="container"> 
+
+  <h1 class="title">{{title}}</h1>
+  <div class="box">
+    <div class="box-navigator">
+        <div class="json-input">Json input</div> 
+        <!-- we can add this later with (click)="function() -->
+        <!-- <div class="hash-input">Transaction Hash</div> -->
+    </div>
+    <!-- ace editor -->
+    <div
+      class="app-ace-editor"
+      #editor
+      style="width: 500px;height: 250px;"
+    ></div>
+
+    <div
+      class="button"
+      (click)="onClick()"
+    >
+      <div class="button-text">
+        Decode
+      </div>
+    </div>
+
+  </div>
+  <div class="box-output" id="box-output">
+    <div class="data-title">
+      <div>Parsed data</div>
+    </div>
+    <div class="json-output" id="json-output">
+
+    </div>
+  </div>
+</div>
+
+
+
+<router-outlet></router-outlet>
