@@ -120,8 +120,14 @@ async function getNetworkAndTokenData(token: string)
 
 }
 
-export async function Parser(input: any) {
-    let data = JSON.parse(input);
+async function parseJson(input: string|Object)
+{
+    let data;
+    // check if input is a string
+    if(typeof input == "string")
+        data = JSON.parse(input); 
+    else
+        data = input;
     let output = [];
 
     // we want to extract the data from the data array of objects
@@ -152,4 +158,45 @@ export async function Parser(input: any) {
     }
 
     return output;
+}
+
+async function parseAddress(address: string)
+{
+    return undefined; // TODO
+}
+
+async function parseHash(hash: string)
+{
+    return undefined; // TODO
+}
+
+/**
+ * 
+ * @param input a string or object containing the data to be parsed or a transaction hash or address
+ * @param type a number indicating the type of input from 0 to 2
+ * @returns an object containing the parsed data or undefined
+ */
+export async function Parser(input: any, type: number) {
+
+    // 0 - orderbook json in an array
+    // 1 - address
+    // 2 - transaction hash
+
+    if(type == 0)
+    {
+        return await parseJson(input);
+    }
+    else if(type == 1)
+    {
+        return await parseAddress(input);
+    }
+    else if(type == 2)
+    {
+        return await parseHash(input);
+    }
+    else
+    {
+        return undefined;
+    }
+    
 }

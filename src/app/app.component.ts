@@ -52,7 +52,7 @@ export class AppComponent implements AfterViewInit {
     const aceEditor = ace.edit(this.editor.nativeElement);
     const text = aceEditor.getValue();
 
-    this.parsedData = await Parser(text);
+    this.parsedData = await Parser(text, 0);
 
   }
 
@@ -62,9 +62,13 @@ export class AppComponent implements AfterViewInit {
     if(maybeInput!=null)
     {
       const input = maybeInput.innerText;
-      if(input.length == 40)
+      if(input.length == 42) // if it's 42 then it's an address
       {
-        this.parsedData = Parser(input);
+        this.parsedData = Parser(input, 1);
+      }
+      else if(input.length == 66) // if it's 66 then it's a transaction hash
+      {
+        this.parsedData = Parser(input, 2);
       }
     }
   }
