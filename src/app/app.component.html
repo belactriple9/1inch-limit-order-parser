@@ -1,40 +1,132 @@
+<tui-root>
+  <div class="container">
 
-<div class="container"> 
+    <h1 class="title">{{title}}</h1>
 
-  <h1 class="title">{{title}}</h1>
-  <div class="box">
-    <div class="box-navigator">
-        <div class="json-input">Json input</div> 
-        <!-- we can add this later with (click)="function() -->
-        <!-- <div class="hash-input">Transaction Hash</div> -->
+
+
+    <div class="box">
+      <div class="box-navigator">
+        <div class="tabs">
+          <tui-tabs [(activeItemIndex)]="activeItemIndex">
+              <button class="tab-handler" *ngFor="let tab of tabs" tuiTab >
+                <div (click)="initEditor()">
+                  {{tab}}
+                </div>
+              </button>
+          </tui-tabs>
+            <ng-container [ngSwitch]="activeItemIndex">
+              <ng-container *ngSwitchCase="0" >
+                <h2>
+                  <span>{{tabs[0]}}</span>
+                </h2>
+                      <!-- ace editor -->
+                  <div   
+                  class="app-ace-editor"
+                  id="app-ace-editor"
+                  #editor
+                  style="width: 500px;height: 250px;"
+                ></div>
+                <div
+                  class="button"
+                  (click)="jsonDecode()"
+                >
+                  <div class="button-text">
+                    Decode
+                  </div>
+                </div>
+              </ng-container>
+              <!-- second tab -->
+              <ng-container *ngSwitchCase="1">
+                <div class="tab2-content">
+                  <div class="box-content-text">
+                    <div class="box-content-text-title">
+                      <h2>
+                        {{tabs[1]}}
+                      </h2>
+                    </div>
+                    <div class="box-content-text-content">
+                      <div class="box-content-text-content-text">
+                        <!-- textarea for the hash -->
+                        <textarea
+                          class="textarea-input"
+                          id="textarea-input"
+                          #textarea
+                          (keyup)="onKeyUp($event)"
+                          placeholder="Enter your hash here"
+                        ></textarea>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+              <!-- third tab -->
+              <ng-container *ngSwitchCase="2">
+                <div class="tab3-content">
+                  <div class="box-content-text">
+                    <div class="box-content-text-title">
+                      <h2>
+                        {{tabs[2]}}
+                      </h2>
+                    </div>
+                    <div class="box-content-text-content">
+                      <div class="box-content-text-content-text">
+                        <!-- textarea for the address -->
+                        <textarea
+                          class="textarea-input"
+                          id="textarea-input"
+                          #textarea
+                          (keyup)="onKeyUp($event)"
+                          placeholder="Enter the address here"
+                        ></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </ng-container>
+        </div>
+      </div>
+
+
     </div>
-    <!-- ace editor -->
-    <div
-      class="app-ace-editor"
-      #editor
-      style="width: 500px;height: 250px;"
-    ></div>
-
-    <div
-      class="button"
-      (click)="onClick()"
-    >
-      <div class="button-text">
-        Decode
+    <div class="box-output" id="box-output">
+      <div class="data-title">
+        <div>Parsed data</div>
+      </div>
+      <div *ngIf="!!parsedData" class="json-output">
+        <div *ngFor="let item of parsedData; let i = index" class='wrap-collapsible'>
+          <input class='toggle' [attr.id]="'collapsible' + i" type='checkbox'>
+          <label [attr.for]="'collapsible' + i" class='lbl-toggle'> {{item.maker}} </label>
+          <div class='collapsible-content'>
+            <div class='content-inner'>
+              <!-- from token box -->
+              <div class='from-token-box'>
+                <span class='from-token-box-top'>From Token</span>
+                <div class='from-token-box-inner'>
+                  <span class='from-token-box-inner-left'> {{item.fromTokenName}} </span>
+                  <span class='from-token-box-inner-right'> {{item.makerAmount}} </span>
+                </div>
+                <span class='from-token-box-bottom'> {{item.fromTokenSymbol}} </span>
+              </div>
+              <!-- to token box -->
+              <div class='to-token-box'>
+                <span class='to-token-box-top'>To Token</span>
+                <div class='to-token-box-inner'>
+                  <span class='to-token-box-inner-left'> {{item.toTokenName}} </span>
+                  <span class='to-token-box-inner-right'> {{item.takerAmount}} </span>
+                </div>
+                <span class='to-token-box-bottom'> {{item.toTokenSymbol}} </span>
+              </div>  
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-
   </div>
-  <div class="box-output" id="box-output">
-    <div class="data-title">
-      <div>Parsed data</div>
-    </div>
-    <div class="json-output" id="json-output">
-
-    </div>
-  </div>
-</div>
 
 
 
-<router-outlet></router-outlet>
+  <router-outlet></router-outlet>
+</tui-root>

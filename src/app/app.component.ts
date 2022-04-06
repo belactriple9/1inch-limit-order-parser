@@ -15,46 +15,58 @@ export class AppComponent implements AfterViewInit {
   title = '1inch Limit Order Parser';
   @ViewChild('editor') editor:any;
 
-  constructor() { }
+  parsedData: any = null;
+
+  activeItemIndex = 0;
+  
+
+  tabs = [
+    'Json input',
+    'Hash input',
+    'Address input',
+  ];
+
+
+  ngDoCheck() {
+    if(this.activeItemIndex === 0)
+    {
+      this.initEditor();
+    }
+  }
 
   ngAfterViewInit() {
-    let aceEditor = ace.edit(this.editor.nativeElement);
+    this.initEditor();
+  }
 
+  initEditor(){
+    // let garbage = ace.edit(this.editor.nativeElement);
+    
+    const maybeEditor = document.getElementById('app-ace-editor');
+    if(maybeEditor!=null)
+    {
+      const aceEditor = ace.edit(maybeEditor);
+    }
+  }
+
+  async jsonDecode() {
+    const aceEditor = ace.edit(this.editor.nativeElement);
+    const text = aceEditor.getValue();
+
+    this.parsedData = await Parser(text);
 
   }
 
-  async onClick() {
-    let aceEditor = ace.edit(this.editor.nativeElement);
-    let text = aceEditor.getValue();
-    let data = Parser(text);
-    let output = await buildOutput(data);
-    // write output to the box-output
-    const outputBox = document.getElementById('json-output');
-      if(outputBox!=null)
+  onKeyUp(event: any) {
+    // get the input value from the textarea
+    const maybeInput = document.getElementById('textarea-input');
+    if(maybeInput!=null)
+    {
+      const input = maybeInput.innerText;
+      if(input.length == 40)
       {
-          outputBox.innerHTML = output;
+        this.parsedData = Parser(input);
       }
-
-
+    }
   }
+
 }
-
-
-// @Component({
-//   selector: 'app-root',
-//   templateUrl: './app.component.html',
-//   styleUrls: ['./app.component.css']
-// })
-
-
-// export class AppComponent implements AfterViewInit {
-//   title = '1inch Limit Order Parser';
-
-//   @ViewChild("editor") private editor:any;
-
-//   ngAfterViewInit() {
-//     var editor = ace.edit(this.editor.nativeElement);
-//     Parser(editor);
-//   }
-// }
-
