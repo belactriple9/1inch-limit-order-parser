@@ -18,22 +18,55 @@ export class AppComponent implements AfterViewInit {
   parsedData: any = null;
 
   activeItemIndex = 0;
+  
 
   tabs = [
-    'Tab 1',
-    'Tab 2',
+    'Json input',
+    'Hash input',
+    'Address input',
   ];
 
-  constructor() { }
 
-  ngAfterViewInit() {
-    let aceEditor = ace.edit(this.editor.nativeElement);
+  ngDoCheck() {
+    if(this.activeItemIndex === 0)
+    {
+      this.initEditor();
+    }
   }
 
-  async onClick() {
+  ngAfterViewInit() {
+    this.initEditor();
+  }
+
+  initEditor(){
+    // let garbage = ace.edit(this.editor.nativeElement);
+    
+    const maybeEditor = document.getElementById('app-ace-editor');
+    if(maybeEditor!=null)
+    {
+      const aceEditor = ace.edit(maybeEditor);
+    }
+  }
+
+  async jsonDecode() {
     const aceEditor = ace.edit(this.editor.nativeElement);
     const text = aceEditor.getValue();
 
-    this.parsedData = Parser(text);
+    this.parsedData = await Parser(text);
+
   }
+
+  onKeyUp(event: any) {
+    // get the input value from the textarea
+    const maybeInput = document.getElementById('textarea-input');
+    if(maybeInput!=null)
+    {
+      const input = maybeInput.innerText;
+      if(input.length == 40)
+      {
+        this.parsedData = Parser(input);
+      }
+    }
+  }
+
 }

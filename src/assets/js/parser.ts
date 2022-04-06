@@ -60,7 +60,62 @@ let data =
 ]
 */
 
-export function Parser(input: any) {
+
+
+//hex to ascii
+function hex2a(hexx:string) {
+    var hex = hexx.toString();//force conversion
+    var str = '';
+    for (var i = 0; i < hex.length; i += 2)
+        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    return str;
+}
+
+// this will get the current network along with the token information
+// TODO - use https://github.com/1inch/multicall in the future for better perfom    
+async function getNetworkAndTokenData(token: string)
+{
+    // name signature: 0x06fdde03
+    // symbol signature: 0x95d89b41
+    // we'll use different RPCs for different networks
+    let ethRPC = "https://cloudflare-eth.com/";
+    // example call: fetch("https://cloudflare-eth.com/", {"body": "{\"method\":\"eth_call\",\"params\":[{\"from\":null,\"to\":\"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48\",\"data\":\"0x06fdde03\"}, \"latest\"],\"id\":1,\"jsonrpc\":\"2.0\"}","method": "POST",});
+    let response: any;
+    let responseJson: any;
+    let response2: any;
+    let responseJson2: any;
+
+    // check ETH rpc
+    response = await fetch(ethRPC, {
+        "body": "{\"method\":\"eth_call\",\"params\":[{\"from\":null,\"to\":\"" + token + "\",\"data\":\"0x06fdde03\"}, \"latest\"],\"id\":1,\"jsonrpc\":\"2.0\"}","method": "POST",
+    });
+    responseJson = await response.json();
+    response2 = await fetch(ethRPC, {
+        "body": "{\"method\":\"eth_call\",\"params\":[{\"from\":null,\"to\":\"" + token + "\",\"data\":\"0x95d89b41\"}, \"latest\"],\"id\":1,\"jsonrpc\":\"2.0\"}","method": "POST",   
+    });
+    responseJson2 = await response2.json();
+    // additional check from 1inch's token list 
+
+    if(responseJson.result != "0x" && responseJson2.result != "0x")
+    {
+        let name = hex2a(responseJson.result.substring(130).replace(/^0+|0+$/g, ""));
+        let symbol = hex2a(responseJson2.result.substring(130).replace(/^0+|0+$/g, ""));
+        return {
+            "chainId": "1",
+            "name": name,
+            "symbol": symbol,
+        };
+    }
+
+    return {
+        "chainId": "0", // 0 means not a valid token or unknown chain
+        "name": "",
+    }
+    
+
+}
+
+export async function Parser(input: any) {
     let data = JSON.parse(input);
     let output = [];
 
@@ -70,6 +125,10 @@ export function Parser(input: any) {
     // the expiration time is a unix timestamp within the predicate 64 characters after the index of "63592c2b"
     for(let i=0; i<data.length; i++)
     {
+        let fromTokenInfo = await getNetworkAndTokenData(data[i].data.makerAsset);
+        let toTokenInfo = await getNetworkAndTokenData(data[i].data.takerAsset);
+
+
         output.push({
             "maker": data[i].data.maker,
             "makerAsset": data[i].data.makerAsset,
@@ -78,6 +137,10 @@ export function Parser(input: any) {
             "takerAmount": data[i].data.takingAmount,
             "creationTime": data[i].createDateTime,
             "expirationTime": data[i].data.predicate.substring(data[i].data.predicate.indexOf("63592c2b")+11, data[i].data.predicate.indexOf("63592c2b")+75).replace(/^0+/,''), // remove leading zeros on the timestamp
+            "fromTokenSymbol": fromTokenInfo.symbol,
+            "fromTokenName": fromTokenInfo.name,
+            "toTokenSymbol": toTokenInfo.symbol,
+            "toTokenName": toTokenInfo.name,
         })
     }
 
