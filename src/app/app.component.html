@@ -118,9 +118,25 @@
                   <span class='to-token-box-inner-right'> {{item.takerAmount}} </span>
                 </div>
                 <span class='to-token-box-bottom'> {{item.toTokenSymbol}} </span>
-              </div>  
+              </div> 
+              <!-- additional information -->
+              <div class='additional-info-box'>
+                <div class="additional-info-left">
+                  <!-- creation time row -->
+                  <div class='creation-time-row'>
+                    <span class='creation-time-row-top'>Creation Time</span>
+                    <span class='creation-time-row-bottom'> {{item.creationTime}} </span>
+                </div>
+                <!-- expiration time row -->
+                <div class='expiration-time-row'>
+                  <span class='expiration-time-row-top'>Expiration Time</span>
+                  <span class='expiration-time-row-bottom'> {{item.expirationTime}} </span>
+                </div>
+              </div>
+              </div>
             </div>
           </div>
+          <!-- end collapsable content-->
         </div>
       </div>
     </div>

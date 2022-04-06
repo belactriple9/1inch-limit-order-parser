@@ -66,6 +66,11 @@ let data =
 function hex2a(hexx:string) {
     var hex = hexx.toString();//force conversion
     var str = '';
+    // if the hex string is odd, add a trailing 0
+    if (hex.length % 2 != 0) {
+        hex += '0';
+    }
+
     for (var i = 0; i < hex.length; i += 2)
         str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
     return str;
@@ -127,7 +132,9 @@ export async function Parser(input: any) {
     {
         let fromTokenInfo = await getNetworkAndTokenData(data[i].data.makerAsset);
         let toTokenInfo = await getNetworkAndTokenData(data[i].data.takerAsset);
-
+        let expirationHexTimestamp = data[i].data.predicate.substring(data[i].data.predicate.indexOf("63592c2b")+11, data[i].data.predicate.indexOf("63592c2b")+75).replace(/^0+/,''); // remove leading zeros on the timestamp
+        // convert to unix timestamp then to date in the format of 2022-04-04T18:40:24.849Z
+        let expirationDate = new Date(parseInt(expirationHexTimestamp, 16)).toISOString();
 
         output.push({
             "maker": data[i].data.maker,
@@ -136,7 +143,7 @@ export async function Parser(input: any) {
             "makerAmount": data[i].data.makingAmount,
             "takerAmount": data[i].data.takingAmount,
             "creationTime": data[i].createDateTime,
-            "expirationTime": data[i].data.predicate.substring(data[i].data.predicate.indexOf("63592c2b")+11, data[i].data.predicate.indexOf("63592c2b")+75).replace(/^0+/,''), // remove leading zeros on the timestamp
+            "expirationTime": expirationDate,
             "fromTokenSymbol": fromTokenInfo.symbol,
             "fromTokenName": fromTokenInfo.name,
             "toTokenSymbol": toTokenInfo.symbol,
