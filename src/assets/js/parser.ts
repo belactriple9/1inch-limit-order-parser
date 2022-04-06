@@ -72,9 +72,7 @@ function hex2a(hexx:string) {
 }
 
 // this will get the current network along with the token information
-<<<<<<< HEAD
 // TODO - use https://github.com/1inch/multicall in the future for better perfomance
-=======
 async function getNetworkAndTokenData(token: string)
 {
     // name signature: 0x06fdde03
