@@ -52,7 +52,7 @@
                           class="textarea-input"
                           id="textarea-input"
                           #textarea
-                          (keyup)="onKeyUp($event)"
+                          (keyup)="textareaChanged($event)"
                           placeholder="Enter your hash here"
                         ></textarea>
 
@@ -77,7 +77,7 @@
                           class="textarea-input"
                           id="textarea-input"
                           #textarea
-                          (keyup)="onKeyUp($event)"
+                          (change)="textareaChanged($event)"
                           placeholder="Enter the address here"
                         ></textarea>
                       </div>
@@ -124,19 +124,19 @@
               <div class='additional-info-box'>
                 <div class="additional-info-left">
                   <!-- creation time row -->
-                  <div class='creation-time-row'>
+                  <div class='creation-time-row'> <!-- should never be null -->
                     <span class='creation-time-row-top'>Creation Time</span>
                     <span class='creation-time-row-bottom'> {{item.creationTime}} </span>
                 </div>
                 <!-- expiration time row -->
-                <div class='expiration-time-row'>
-                  <span class='expiration-time-row-top'>Expiration Time</span>
-                  <span class='expiration-time-row-bottom'> {{item.expirationTime}} </span>
+                <div class='expiration-time-row' *ngIf="item.expirationTime"> <!-- hide row if expiration time isn't set-->
+                  <span class='expiration-time-row-top' *ngIf="item.expirationTime">Expiration Time</span>
+                  <span class='expiration-time-row-bottom' *ngIf="item.expirationTime"> {{item.expirationTime}} </span>
                 </div>
                 <!-- nonce row -->
-                <div class='nonce-row'>
-                  <span class='nonce-row-top'>Nonce</span>
-                  <span class='nonce-row-bottom'> {{item.nonce}} </span>
+                <div class='nonce-row' *ngIf="item.nonce"> <!-- hide row if nonce isn't set-->
+                  <span class='nonce-row-top' *ngIf="item.nonce">Nonce</span>
+                  <span class='nonce-row-bottom' *ngIf="item.nonce"> {{item.nonce}} </span>
                 </div>
               </div>
               </div>

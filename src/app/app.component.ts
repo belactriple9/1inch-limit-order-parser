@@ -56,7 +56,7 @@ export class AppComponent implements AfterViewInit {
 
   }
 
-  onKeyUp(event: any) {
+  textareaChanged(event: any) {
     // get the input value from the textarea
     const maybeInput = document.getElementById('textarea-input');
     if(maybeInput!=null)
