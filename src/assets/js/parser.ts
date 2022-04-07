@@ -1,7 +1,7 @@
 
 // example input data
 /*
-let data =
+let data = 
 [
   {
     "signature": "0x2e9c54cb50d1e281f5ec81ad00af043f3626e990ed1a176b319b148a1d39f2ab6baa189f007a9f617fcf2a65df035990af1afbf5cb2fc08947a0572b9886edd41c",
@@ -99,10 +99,10 @@ async function getNetworkAndTokenData(token: string)
     });
     responseJson = await response.json();
     response2 = await fetch(ethRPC, {
-        "body": "{\"method\":\"eth_call\",\"params\":[{\"from\":null,\"to\":\"" + token + "\",\"data\":\"0x95d89b41\"}, \"latest\"],\"id\":1,\"jsonrpc\":\"2.0\"}","method": "POST",
+        "body": "{\"method\":\"eth_call\",\"params\":[{\"from\":null,\"to\":\"" + token + "\",\"data\":\"0x95d89b41\"}, \"latest\"],\"id\":1,\"jsonrpc\":\"2.0\"}","method": "POST",   
     });
     responseJson2 = await response2.json();
-    // additional check from 1inch's token list
+    // additional check from 1inch's token list 
 
     if(responseJson.result != "0x" && responseJson2.result != "0x")
     {
@@ -119,7 +119,7 @@ async function getNetworkAndTokenData(token: string)
         "chainId": "0", // 0 means not a valid token or unknown chain
         "name": "",
     }
-
+    
 
 }
 
@@ -128,22 +128,29 @@ async function parseJson(input: string|Object)
     let data;
     // check if input is a string
     if(typeof input == "string")
-        data = JSON.parse(input);
+        data = JSON.parse(input); 
     else
         data = input;
     let output = [];
 
     // we want to extract the data from the data array of objects
     // specifically we want the maker, the maker asset, the taker asset, the maker amount and the taker amount.
-    // we also want to extract the creation time and the expiration time.
+    // we also want to extract the creation time and the expiration time. 
     // the expiration time is a unix timestamp within the predicate 64 characters after the index of "63592c2b"
     for(let i=0; i<data.length; i++)
     {
         let fromTokenInfo = await getNetworkAndTokenData(data[i].data.makerAsset);
         let toTokenInfo = await getNetworkAndTokenData(data[i].data.takerAsset);
-        let expirationHexTimestamp = data[i].data.predicate.substring(data[i].data.predicate.indexOf("63592c2b")+11, data[i].data.predicate.indexOf("63592c2b")+75).replace(/^0+/,''); // remove leading zeros on the timestamp
-        // convert to unix timestamp then to date in the format of 2022-04-04T18:40:24.849Z
-        let expirationDate = new Date(parseInt(expirationHexTimestamp, 16)).toISOString();
+        // let expirationHexTimestamp = data[i].data.predicate.substring(data[i].data.predicate.indexOf("63592c2b")+11, data[i].data.predicate.indexOf("63592c2b")+75).replace(/^0+/,''); // remove leading zeros on the timestamp
+
+        // we'll parse the predicate to get the expiration time
+        // we need to go through until we find the first "63592c2b"
+        // we'll then use the result out of the returned object to get the timestamp
+        let predicate = data[i].data.predicate;
+        let parsedPredicate = loopParsePredicates(predicate);
+        let expirationDate = parsedPredicate.expiration;
+        let nonceData = parsedPredicate.nonce;
+        
 
         output.push({
             "maker": data[i].data.maker,
@@ -157,6 +164,8 @@ async function parseJson(input: string|Object)
             "fromTokenName": fromTokenInfo.name,
             "toTokenSymbol": toTokenInfo.symbol,
             "toTokenName": toTokenInfo.name,
+            // Todo - add permit information
+            "nonce": nonceData,
         })
     }
 
@@ -174,7 +183,7 @@ async function parseHash(hash: string)
 }
 
 /**
- *
+ * 
  * @param input a string or object containing the data to be parsed or a transaction hash or address
  * @param type a number indicating the type of input from 0 to 2
  * @returns an object containing the parsed data or undefined
@@ -185,6 +194,7 @@ export async function Parser(input: any, type: number) {
     // 1 - address
     // 2 - transaction hash
 
+    
     if(type == 0)
     {
         return await parseJson(input);
@@ -201,19 +211,120 @@ export async function Parser(input: any, type: number) {
     {
         return undefined;
     }
-
+    
 }
 
-function parsePredicates(predicate: string) {
-  const iface = new Interface(LimitOrderProtocolABISource);
-  const selector = predicate.slice(0, 10);
+function loopParsePredicates(predicate: string | undefined)
+{
 
-  const result = iface.decodeFunctionData(selector, predicate);
-  const method = iface.getFunction(selector);
+    let parsedPredicate = parsePredicates(predicate);
+    let resultPredicateArray:string[] = [];
+    let expirationHexTimestamp = undefined;
+    let nonceData = undefined;
 
-  return {method, result};
+    do 
+    {
+        
+        if(parsedPredicate === undefined)
+            break;
+        if(Array.isArray(parsedPredicate.result[1]) && parsedPredicate.result[1].length != undefined) // warning, short circuits may cause errors
+            resultPredicateArray = [...resultPredicateArray, ...parsedPredicate.result[1]];
+
+        // console.log(resultPredicateArray);
+
+        // console.log(parsedPredicate.method.name);
+        if(parsedPredicate.method.name === "timestampBelow")
+        {
+            // console.log("timestampBelow: " + parsedPredicate.result[0]._hex); 
+            expirationHexTimestamp = parsedPredicate.result[0]._hex;
+        }
+        if(parsedPredicate.method.name === "nonceEquals")
+        {
+            // console.log("nonceEquals: " + parsedPredicate.result[0]._hex); 
+            nonceData = parseInt(parsedPredicate.result[1]._hex);
+        }
+
+        // if not, we'll move to the next predicate by popping it from the result array
+        // if the result array is empty, we'll break out of the loop
+        if(resultPredicateArray.length > 0)
+            parsedPredicate = parsePredicates(resultPredicateArray.pop());
+        else
+            break;
+    } while(resultPredicateArray.length>=0);
+
+    const expirationDate = new Date(parseInt(expirationHexTimestamp, 16) * 1000).toISOString();
+
+    return {expiration: expirationDate, nonce: nonceData};
 }
 
-// console.log(
-//   parsePredicates('0x961d5b1e000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000002000000000000000000000000119c71d3bbac22029622cbaec24854d3d32d2828000000000000000000000000119c71d3bbac22029622cbaec24854d3d32d28280000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000044cf6fc6e300000000000000000000000007ccf7447188b44da874f3a87773989628d3081e000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002463592c2b000000000000000000000000000000000000000000000000000000006256cc3800000000000000000000000000000000000000000000000000000000')
-// );
+// https://docs.ethers.io/v5/api/utils/abi/interface/#Interface--decoding
+function parsePredicates(predicate: string | undefined) {
+    if(predicate === undefined)
+        return undefined;
+    // else
+    const iface = new Interface(LimitOrderProtocolABISource);
+    const selector = predicate.slice(0, 10);
+  
+    const result = iface.decodeFunctionData(selector, predicate);
+    const method = iface.getFunction(selector);
+  
+    return {method, result};
+  }
+
+
+/* example return of the above function
+
+{
+  method: FunctionFragment {
+    type: 'function',
+    name: 'and',
+    constant: true,
+    inputs: [ [ParamType], [ParamType] ],
+    outputs: [ [ParamType] ],
+    payable: false,
+    stateMutability: 'view',
+    gas: null,
+    _isFragment: true
+  },
+  result: [
+    [
+      '0x119c71D3BbAC22029622cbaEc24854d3D32D2828',
+      '0x119c71D3BbAC22029622cbaEc24854d3D32D2828'
+    ],
+    [
+      '0xcf6fc6e300000000000000000000000007ccf7447188b44da874f3a87773989628d3081e0000000000000000000000000000000000000000000000000000000000000000',
+      '0x63592c2b000000000000000000000000000000000000000000000000000000006256cc38'
+    ],
+    targets: [
+      '0x119c71D3BbAC22029622cbaEc24854d3D32D2828',
+      '0x119c71D3BbAC22029622cbaEc24854d3D32D2828'
+    ],
+    data: [
+      '0xcf6fc6e300000000000000000000000007ccf7447188b44da874f3a87773989628d3081e0000000000000000000000000000000000000000000000000000000000000000',
+      '0x63592c2b000000000000000000000000000000000000000000000000000000006256cc38'
+    ]
+  ]
+}
+
+OR
+
+{
+  method: FunctionFragment {
+    type: 'function',
+    name: 'timestampBelow',
+    constant: true,
+    inputs: [ [ParamType] ],
+    outputs: [ [ParamType] ],
+    payable: false,
+    stateMutability: 'view',
+    gas: null,
+    _isFragment: true
+  },
+  result: [
+    BigNumber { _hex: '0x6256cc38', _isBigNumber: true },
+    time: BigNumber { _hex: '0x6256cc38', _isBigNumber: true }
+  ]
+}
+
+*/
+

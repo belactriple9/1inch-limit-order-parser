@@ -177,3 +177,13 @@ input {
     margin: 0 auto;
     color: white;
   }
+
+  .nonce-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+    color: white;
+  }

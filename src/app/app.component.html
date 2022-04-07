@@ -100,6 +100,7 @@
           <input class='toggle' [attr.id]="'collapsible' + i" type='checkbox'>
           <label [attr.for]="'collapsible' + i" class='lbl-toggle'> {{item.maker}} </label>
           <div class='collapsible-content'>
+            <!-- TODO fix content-inner to display this or error depending on item-->
             <div class='content-inner'>
               <!-- from token box -->
               <div class='from-token-box'>
@@ -131,6 +132,11 @@
                 <div class='expiration-time-row'>
                   <span class='expiration-time-row-top'>Expiration Time</span>
                   <span class='expiration-time-row-bottom'> {{item.expirationTime}} </span>
+                </div>
+                <!-- nonce row -->
+                <div class='nonce-row'>
+                  <span class='nonce-row-top'>Nonce</span>
+                  <span class='nonce-row-bottom'> {{item.nonce}} </span>
                 </div>
               </div>
               </div>
