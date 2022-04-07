@@ -64,6 +64,14 @@ import {Interface, Result} from '@ethersproject/abi';
 
 const LimitOrderProtocolABISource = require('../../abi/LimitOrderProtocol.json');
 
+import {
+    LimitOrderProtocolFacade,
+    LimitOrder,
+    Web3ProviderConnector
+} from '@1inch/limit-order-protocol';
+
+import Web3 from 'web3';
+
 //hex to ascii
 
 function hex2a(hexx:string) {
@@ -166,6 +174,7 @@ async function parseJson(input: string|Object)
             "toTokenName": toTokenInfo.name,
             // Todo - add permit information
             "nonce": nonceData,
+            // Todo - add validity information https://docs.1inch.io/docs/limit-order-protocol/guide/validate-limit-order
         })
     }
 
@@ -174,7 +183,13 @@ async function parseJson(input: string|Object)
 
 async function parseAddress(address: string)
 {
-    return undefined; // TODO
+    // we'll need to fetch from 
+    //https://limit-orders.1inch.io/v2.0/1/limit-order/address/address?page=1&limit=100&statuses=%5B1%5D
+
+    let callReturn = await fetch(`https://limit-orders.1inch.io/v2.0/1/limit-order/address/${address}?page=1&limit=100&statuses=%5B1%2C2%2C3%5D`)
+    let orderJson = await callReturn.json();
+
+    return parseJson(orderJson); // TODO
 }
 
 async function parseHash(hash: string)

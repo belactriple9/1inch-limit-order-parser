@@ -48,14 +48,22 @@
                     <div class="box-content-text-content">
                       <div class="box-content-text-content-text">
                         <!-- textarea for the hash -->
-                        <textarea
-                          class="textarea-input"
-                          id="textarea-input"
-                          #textarea
-                          (keyup)="textareaChanged($event)"
-                          placeholder="Enter your hash here"
-                        ></textarea>
+                        <div
+                        contenteditable="true"
+                        class="textarea-input"
+                        id="textarea-input"
+                        #textarea
+                        placeholder="Enter the address here"
+                      ></div>
 
+                      </div>
+                    </div>
+                    <div
+                    class="button"
+                    (click)="textareaChanged()"
+                    >
+                      <div class="button-text">
+                        Decode
                       </div>
                     </div>
                   </div>
@@ -73,13 +81,22 @@
                     <div class="box-content-text-content">
                       <div class="box-content-text-content-text">
                         <!-- textarea for the address -->
-                        <textarea
+                        <div
+                          contenteditable="true"
                           class="textarea-input"
                           id="textarea-input"
                           #textarea
-                          (change)="textareaChanged($event)"
                           placeholder="Enter the address here"
-                        ></textarea>
+                        ></div>
+                      </div>
+                    </div>
+                    <!-- button to decode -->
+                    <div
+                    class="button"
+                    (click)="textareaChanged()"
+                    >
+                      <div class="button-text">
+                        Decode
                       </div>
                     </div>
                   </div>

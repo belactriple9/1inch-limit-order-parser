@@ -56,19 +56,23 @@ export class AppComponent implements AfterViewInit {
 
   }
 
-  textareaChanged(event: any) {
+  async textareaChanged() {
     // get the input value from the textarea
     const maybeInput = document.getElementById('textarea-input');
     if(maybeInput!=null)
     {
-      const input = maybeInput.innerText;
-      if(input.length == 42) // if it's 42 then it's an address
+      const input = maybeInput.textContent;
+      if(input != null)
       {
-        this.parsedData = Parser(input, 1);
-      }
-      else if(input.length == 66) // if it's 66 then it's a transaction hash
-      {
-        this.parsedData = Parser(input, 2);
+        if(input.length == 42) // if it's 42 then it's an address
+        {
+          console.log("got an address!");
+          this.parsedData = await Parser(input, 1);
+        }
+        else if(input.length == 66) // if it's 66 then it's a transaction hash
+        {
+          this.parsedData = await Parser(input, 2);
+        }
       }
     }
   }
