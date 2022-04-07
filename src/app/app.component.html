@@ -29,10 +29,11 @@
                 ></div>
                 <div
                   class="button"
+                  id="decode-button"
                   (click)="jsonDecode()"
                 >
                   <div class="button-text">
-                    Decode
+                    {{decodeButtonText}}
                   </div>
                 </div>
               </ng-container>
@@ -60,10 +61,11 @@
                     </div>
                     <div
                     class="button"
+                    id="decode-button"
                     (click)="textareaChanged()"
                     >
                       <div class="button-text">
-                        Decode
+                        {{decodeButtonText}}
                       </div>
                     </div>
                   </div>
@@ -93,10 +95,11 @@
                     <!-- button to decode -->
                     <div
                     class="button"
+                    id="decode-button"
                     (click)="textareaChanged()"
                     >
                       <div class="button-text">
-                        Decode
+                        {{decodeButtonText}}
                       </div>
                     </div>
                   </div>

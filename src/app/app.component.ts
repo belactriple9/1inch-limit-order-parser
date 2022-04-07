@@ -19,6 +19,7 @@ export class AppComponent implements AfterViewInit {
 
   activeItemIndex = 0;
   
+  decodeButtonText = "Decode";
 
   tabs = [
     'Json input',
@@ -52,26 +53,32 @@ export class AppComponent implements AfterViewInit {
     const aceEditor = ace.edit(this.editor.nativeElement);
     const text = aceEditor.getValue();
 
+    this.decodeButtonText = "Decoding... Please wait"
     this.parsedData = await Parser(text, 0);
-
+    this.decodeButtonText = "Decode";
   }
 
   async textareaChanged() {
     // get the input value from the textarea
     const maybeInput = document.getElementById('textarea-input');
+    
     if(maybeInput!=null)
     {
       const input = maybeInput.textContent;
       if(input != null)
       {
+
         if(input.length == 42) // if it's 42 then it's an address
         {
-          console.log("got an address!");
+          this.decodeButtonText = "Decoding... Please wait"
           this.parsedData = await Parser(input, 1);
+          this.decodeButtonText = "Decode";
         }
         else if(input.length == 66) // if it's 66 then it's a transaction hash
         {
+          this.decodeButtonText = "Decoding... Please wait"
           this.parsedData = await Parser(input, 2);
+          this.decodeButtonText = "Decode";
         }
       }
     }
