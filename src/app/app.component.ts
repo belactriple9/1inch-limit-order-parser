@@ -71,6 +71,7 @@ export class AppComponent implements AfterViewInit {
         if(input.length == 42) // if it's 42 then it's an address
         {
           this.decodeButtonText = "Decoding... Please wait"
+          // maybe disable decode button temporarily? TODO
           this.parsedData = await Parser(input, 1);
           this.decodeButtonText = "Decode";
         }
@@ -79,6 +80,9 @@ export class AppComponent implements AfterViewInit {
           this.decodeButtonText = "Decoding... Please wait"
           this.parsedData = await Parser(input, 2);
           this.decodeButtonText = "Decode";
+        }
+        else{
+          this.activeItemIndex == 1 ? alert("Invalid Hash") : alert("Invalid Address");
         }
       }
     }

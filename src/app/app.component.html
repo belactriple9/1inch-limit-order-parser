@@ -43,7 +43,7 @@
                   <div class="box-content-text">
                     <div class="box-content-text-title">
                       <h2>
-                        {{tabs[1]}}
+                        Order/Transaction {{tabs[1]}}  
                       </h2>
                     </div>
                     <div class="box-content-text-content">
@@ -123,40 +123,40 @@
             <!-- TODO fix content-inner to display this or error depending on item-->
             <div class='content-inner'>
               <!-- from token box -->
-              <div class='from-token-box'>
-                <span class='from-token-box-top'>From Token</span>
-                <div class='from-token-box-inner'>
-                  <span class='from-token-box-inner-left'> {{item.fromTokenName}} </span>
-                  <span class='from-token-box-inner-right'> {{item.makerAmount}} </span>
+              <div class='from-token-box' *ngIf="!!item.fromTokenName">
+                <span class='from-token-box-top' *ngIf="!!item.fromTokenName">From Token</span>
+                <div class='from-token-box-inner' *ngIf="!!item.fromTokenName">
+                  <span class='from-token-box-inner-left' *ngIf="!!item.fromTokenName"> {{item.fromTokenName}} </span>
+                  <span class='from-token-box-inner-right' *ngIf="!!item.fromTokenName"> {{item.makerAmount}} </span>
                 </div>
-                <span class='from-token-box-bottom'> {{item.fromTokenSymbol}} </span>
+                <span class='from-token-box-bottom' *ngIf="!!item.fromTokenName"> {{item.fromTokenSymbol}} </span>
               </div>
               <!-- to token box -->
-              <div class='to-token-box'>
-                <span class='to-token-box-top'>To Token</span>
-                <div class='to-token-box-inner'>
-                  <span class='to-token-box-inner-left'> {{item.toTokenName}} </span>
-                  <span class='to-token-box-inner-right'> {{item.takerAmount}} </span>
+              <div class='to-token-box' *ngIf="!!item.toTokenName">
+                <span class='to-token-box-top'  *ngIf="!!item.toTokenName">To Token</span>
+                <div class='to-token-box-inner'  *ngIf="!!item.toTokenName">
+                  <span class='to-token-box-inner-left'  *ngIf="!!item.toTokenName"> {{item.toTokenName}} </span>
+                  <span class='to-token-box-inner-right'  *ngIf="!!item.toTokenName"> {{item.takerAmount}} </span>
                 </div>
-                <span class='to-token-box-bottom'> {{item.toTokenSymbol}} </span>
+                <span class='to-token-box-bottom'  *ngIf="!!item.toTokenName"> {{item.toTokenSymbol}} </span>
               </div> 
               <!-- additional information -->
-              <div class='additional-info-box'>
+              <div class='additional-info-box' *ngIf="!! item.reationTime && !!item.expirationTime && !!item.nonce">
                 <div class="additional-info-left">
                   <!-- creation time row -->
-                  <div class='creation-time-row'> <!-- should never be null -->
-                    <span class='creation-time-row-top'>Creation Time</span>
-                    <span class='creation-time-row-bottom'> {{item.creationTime}} </span>
+                  <div class='creation-time-row' *ngIf="!! item.reationTime"> 
+                    <span class='creation-time-row-top' *ngIf="!! item.reationTime">Creation Time</span>
+                    <span class='creation-time-row-bottom' *ngIf="!! item.reationTime"> {{item.creationTime}} </span>
                 </div>
                 <!-- expiration time row -->
-                <div class='expiration-time-row' *ngIf="item.expirationTime"> <!-- hide row if expiration time isn't set-->
-                  <span class='expiration-time-row-top' *ngIf="item.expirationTime">Expiration Time</span>
-                  <span class='expiration-time-row-bottom' *ngIf="item.expirationTime"> {{item.expirationTime}} </span>
+                <div class='expiration-time-row' *ngIf="!!item.expirationTime"> <!-- hide row if expiration time isn't set-->
+                  <span class='expiration-time-row-top' *ngIf="!!item.expirationTime">Expiration Time</span>
+                  <span class='expiration-time-row-bottom' *ngIf="!!item.expirationTime"> {{item.expirationTime}} </span>
                 </div>
                 <!-- nonce row -->
-                <div class='nonce-row' *ngIf="item.nonce"> <!-- hide row if nonce isn't set-->
-                  <span class='nonce-row-top' *ngIf="item.nonce">Nonce</span>
-                  <span class='nonce-row-bottom' *ngIf="item.nonce"> {{item.nonce}} </span>
+                <div class='nonce-row' *ngIf="!!item.nonce"> <!-- hide row if nonce isn't set-->
+                  <span class='nonce-row-top' *ngIf="!!item.nonce">Nonce</span>
+                  <span class='nonce-row-bottom' *ngIf="!!item.nonce"> {{item.nonce}} </span>
                 </div>
               </div>
               </div>
