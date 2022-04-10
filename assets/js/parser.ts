@@ -101,7 +101,18 @@ function hex2a(hexx:string) {
 
 function getLocalTokenInfo(token:string)
 {
-    return null; //TODO check local storage
+    let tokenInfo = null;
+
+    if(localStorage.hasOwnProperty("tokens"))
+    {
+        let tokens = JSON.parse(localStorage["tokens"]);
+        if(tokens.hasOwnProperty(token))
+        {
+            console.log(tokens[token]);
+            tokenInfo = tokens[token];
+        }
+    }
+    return !!tokenInfo ? tokenInfo : null;
 }
 
 // TODO - use https://github.com/1inch/multicall in the future for better perfomance
@@ -120,41 +131,63 @@ async function getTokenData(token:string)
     // first, check if we have saved the token in a token list:
     let isSaved = getLocalTokenInfo(token);
 
-
-    // name signature: 0x06fdde03
-    // symbol signature: 0x95d89b41
-    // we'll use different RPCs for different networks
-    // example call: fetch("https://cloudflare-eth.com/", {"body": "{\"method\":\"eth_call\",\"params\":[{\"from\":null,\"to\":\"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48\",\"data\":\"0x06fdde03\"}, \"latest\"],\"id\":1,\"jsonrpc\":\"2.0\"}","method": "POST",});
-    let response: any;
-    let responseJson: any;
-    let response2: any;
-    let responseJson2: any;
-
-
-    // check ETH rpc
-    response = await fetch(ethRPC, {
-        "body": "{\"method\":\"eth_call\",\"params\":[{\"from\":null,\"to\":\"" + token + "\",\"data\":\"0x06fdde03\"}, \"latest\"],\"id\":1,\"jsonrpc\":\"2.0\"}","method": "POST",
-    });
-    responseJson = await response.json();
-    response2 = await fetch(ethRPC, {
-        "body": "{\"method\":\"eth_call\",\"params\":[{\"from\":null,\"to\":\"" + token + "\",\"data\":\"0x95d89b41\"}, \"latest\"],\"id\":1,\"jsonrpc\":\"2.0\"}","method": "POST",   
-    });
-    responseJson2 = await response2.json();
-    // console.log(responseJson, responseJson2);
-
-    if(responseJson.result != "0x" && responseJson2.result != "0x")
+    if(isSaved === null)
     {
-        let name = hex2a(responseJson.result.substring(130).replace(/^0+|0+$/g, ""));
-        let symbol = hex2a(responseJson2.result.substring(130).replace(/^0+|0+$/g, ""));
-        return {
-            "name": name,
-            "symbol": symbol,
-        };
-    }
+        // name signature: 0x06fdde03
+        // symbol signature: 0x95d89b41
+        // we'll use different RPCs for different networks
+        // example call: fetch("https://cloudflare-eth.com/", {"body": "{\"method\":\"eth_call\",\"params\":[{\"from\":null,\"to\":\"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48\",\"data\":\"0x06fdde03\"}, \"latest\"],\"id\":1,\"jsonrpc\":\"2.0\"}","method": "POST",});
+        let response: any;
+        let responseJson: any;
+        let response2: any;
+        let responseJson2: any;
 
-    return {
-        "name": null,
-        "symbol": null
+
+        // check ETH rpc
+        response = await fetch(ethRPC, {
+            "body": "{\"method\":\"eth_call\",\"params\":[{\"from\":null,\"to\":\"" + token + "\",\"data\":\"0x06fdde03\"}, \"latest\"],\"id\":1,\"jsonrpc\":\"2.0\"}","method": "POST",
+        });
+        responseJson = await response.json();
+        response2 = await fetch(ethRPC, {
+            "body": "{\"method\":\"eth_call\",\"params\":[{\"from\":null,\"to\":\"" + token + "\",\"data\":\"0x95d89b41\"}, \"latest\"],\"id\":1,\"jsonrpc\":\"2.0\"}","method": "POST",   
+        });
+        responseJson2 = await response2.json();
+        // console.log(responseJson, responseJson2);
+
+        if(responseJson.result != "0x" && responseJson2.result != "0x")
+        {
+            let name = hex2a(responseJson.result.substring(130).replace(/^0+|0+$/g, ""));
+            let symbol = hex2a(responseJson2.result.substring(130).replace(/^0+|0+$/g, ""));
+            
+            // save the token in a token list:
+            let tokenInfo = {
+                name: name,
+                symbol: symbol,
+            };
+
+            if(!localStorage.hasOwnProperty("tokens"))
+            {
+                localStorage.setItem("tokens", JSON.stringify({}));
+            }
+
+            // save the token in a token list:
+            let tokens = JSON.parse(localStorage["tokens"]);
+            tokens[token] = JSON.stringify(tokenInfo);
+            localStorage["tokens"] = JSON.stringify(tokens);
+            
+
+            return tokenInfo;
+
+        }
+
+        return {
+            "name": null,
+            "symbol": null
+        }
+    }
+    else
+    {
+        return JSON.parse(isSaved);
     }
 
 }
