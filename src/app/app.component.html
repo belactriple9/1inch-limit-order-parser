@@ -141,12 +141,12 @@
                 <span class='to-token-box-bottom'  *ngIf="!!item.toTokenName"> {{item.toTokenSymbol}} </span>
               </div> 
               <!-- additional information -->
-              <div class='additional-info-box' *ngIf="!! item.reationTime && !!item.expirationTime && !!item.nonce">
+              <div class='additional-info-box'>
                 <div class="additional-info-left">
                   <!-- creation time row -->
-                  <div class='creation-time-row' *ngIf="!! item.reationTime"> 
-                    <span class='creation-time-row-top' *ngIf="!! item.reationTime">Creation Time</span>
-                    <span class='creation-time-row-bottom' *ngIf="!! item.reationTime"> {{item.creationTime}} </span>
+                  <div class='creation-time-row' *ngIf="!! item.creationTime"> 
+                    <span class='creation-time-row-top' *ngIf="!! item.creationTime">Creation Time</span>
+                    <span class='creation-time-row-bottom' *ngIf="!! item.creationTime"> {{item.creationTime}} </span>
                 </div>
                 <!-- expiration time row -->
                 <div class='expiration-time-row' *ngIf="!!item.expirationTime"> <!-- hide row if expiration time isn't set-->
@@ -160,6 +160,17 @@
                 </div>
               </div>
               </div>
+                            <!-- permittable information -->
+                            <div class='permittable-info-box' *ngIf="!!item.permitExpiration">
+                              <div class='permittable-expiration'>
+                                <span>Expiration:</span>
+                                <span>{{item.permitExpiration}}</span>
+                              </div>
+                              <div class="permittable-nonce" *ngIf="!!item.permitNonce">
+                                <span>Nonce:</span>
+                                <span>{{item.permitNonce}}</span>
+                              </div>
+                            </div>
             </div>
           </div>
           <!-- end collapsable content-->

@@ -152,13 +152,7 @@ input {
     color: white;
   }
 
-  .additional-info-box{
-    width: 90%;
-    margin: 0 auto;
-    border: 1px solid #37445a;
-    border-radius: 0px 0px 10px 10px;
-    padding: 10px;
-  }
+
 
   .creation-time-row{
     display: flex;
@@ -199,4 +193,40 @@ input {
     border:1px solid #767676;
     background-color: #fff;
     padding-top: 5px;
+  }
+
+  .additional-info-box{
+    width: 90%;
+    margin: 0 auto;
+    border: 1px solid #37445a;
+    /* border-radius: 0px 0px 10px 10px; */
+    padding: 10px;
+  }
+
+  .permittable-info-box{
+    width: 90%;
+    margin: 0 auto;
+    border: 1px solid #37445a;
+    border-radius: 0px 0px 10px 10px;
+    padding: 10px;
+  }
+
+  .permittable-expiration{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+    color: white;
+  }
+
+  .permittable-nonce{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+    color: white;
   }
