@@ -102,6 +102,9 @@
               "src/assets/js/parser.js"
             ]
           }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy"
         }
       }
     }
