@@ -74,7 +74,7 @@ import Web3 from 'web3';
 import { Chain } from '@angular/compiler';
 
 //RPCs
-const ethRPC = "https://mainnet-nethermind.blockscout.com/";
+const ethRPC = "https://cloudflare-eth.com";
 
 // limit order contracts
 const limitOrderContractETH = '0x119c71d3bbac22029622cbaec24854d3d32d2828';
@@ -140,7 +140,7 @@ async function getTokenData(token:string)
         "body": "{\"method\":\"eth_call\",\"params\":[{\"from\":null,\"to\":\"" + token + "\",\"data\":\"0x95d89b41\"}, \"latest\"],\"id\":1,\"jsonrpc\":\"2.0\"}","method": "POST",   
     });
     responseJson2 = await response2.json();
-    console.log(responseJson, responseJson2);
+    // console.log(responseJson, responseJson2);
 
     if(responseJson.result != "0x" && responseJson2.result != "0x")
     {
@@ -194,7 +194,7 @@ async function parseJson(input: string|Object)
 
         if(predicate != undefined)
         {
-            console.log("Predicate is not empty: " + predicate);
+            // console.log("Predicate is not empty: " + predicate);
             parsedPredicate = loopParsePredicates(predicate);
             expirationDate = parsedPredicate.expiration;
             nonceData = parsedPredicate.nonce;
@@ -204,7 +204,11 @@ async function parseJson(input: string|Object)
             expirationDate = undefined;
             nonceData = undefined;
         }
-        
+
+        // check if the permit is not just 0x and if it isn't then we'll parse it to display to the user
+        let permit = data[i].data.hasOwnProperty("permit") && data[i].data.permit != "0x" ? await parsePermit(data[i].data.permit) : null;
+
+        // console.log(permit);
 
         output.push({
             "maker": data[i].data.maker == null ? "Can't find maker" : data[i].data.maker,
@@ -219,10 +223,14 @@ async function parseJson(input: string|Object)
             "toTokenSymbol": toTokenInfo.symbol,
             "toTokenName": toTokenInfo.name,
             // Todo - add permit information
+            "permitExpiration": permit != null && permit.deadline == undefined ? "No expiration" : permit != null ? permit.deadline.toISOString() : null,
+            "permitNonce": permit != null && permit.nonce != undefined ? permit.nonce : null,
             "nonce": nonceData,
             // Todo - add validity information https://docs.1inch.io/docs/limit-order-protocol/guide/validate-limit-order
         })
     }
+
+    console.log(output);
 
     return output;
 }
@@ -288,7 +296,7 @@ async function getOrderHashData(orderHash: string)
     let output = [];
     if(eventsList != {} && eventsList != undefined)
     {
-        console.log("Events list is not empty: " + JSON.stringify(eventsList));
+        // console.log("Events list is not empty: " + JSON.stringify(eventsList));
         for(let i=0; i<eventsList.length; i++)
         {
             output.push({
@@ -357,7 +365,7 @@ async function parseHash(hash: string)
     
     // if the response is a 500 error
     let responseJson = await response.json();
-    console.log(responseJson);
+    // console.log(responseJson);
     // example responseJson {"jsonrpc":"2.0","id":1,"result":{"blockHash":"0x53ccf5e817446c489868d05b124b600bb80c7887c9a37569a3f6750be690e055","blockNumber":"0xdcc0ca","contractAddress":null,"cumulativeGasUsed":"0x722bc","effectiveGasPrice":"0x557015268","from":"0xce5fcb032941e17121a47875ee242f1eee1de4bc","gasUsed":"0x4eb45","logs":[{"address":"0x6b175474e89094c44da98b954eedeac495271d0f","topics":["0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef","0x000000000000000000000000a478c2975ab1ea89e8196811f51a7b7ade33eb11","0x000000000000000000000000d426be0576f6d8e1c805dcd3db3e4c1d8147406b"],"data":"0x0000000000000000000000000000000000000000000000f72ec4520be414fdd0","blockNumber":"0xdcc0ca","transactionHash":"0x25fd06a5180e60beb4f1fd03ae61c3617ba0aaccbdd8a93f815ec5b53ce0f188","transactionIndex":"0x1","blockHash":"0x53ccf5e817446c489868d05b124b600bb80c7887c9a37569a3f6750be690e055","logIndex":"0x6","removed":false},{"address":"0x119c71d3bbac22029622cbaec24854d3d32d2828","topics":["0xb9ed0243fdf00f0545c63a0af8850c090d86bb46682baec4bf3c496814fe4f02","0x000000000000000000000000d426be0576f6d8e1c805dcd3db3e4c1d8147406b"],"data":"0x2b223b6d4eed6814095f3fc256bfdb2c1087700fb950b32f6a4bb4ae9b4263cc000000000000000000000000000000000000000000000000000000004adc3cf4","blockNumber":"0xdcc0ca","transactionHash":"0x25fd06a5180e60beb4f1fd03ae61c3617ba0aaccbdd8a93f815ec5b53ce0f188","transactionIndex":"0x1","blockHash":"0x53ccf5e817446c489868d05b124b600bb80c7887c9a37569a3f6750be690e055","logIndex":"0x7","removed":false},{"address":"0x6b175474e89094c44da98b954eedeac495271d0f","topics":["0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef","0x000000000000000000000000d426be0576f6d8e1c805dcd3db3e4c1d8147406b","0x000000000000000000000000848ad4041397c1b75b50102efdde22bab8d5b4ab"],"data":"0x0000000000000000000000000000000000000000000000f72ec4494f4e0de400","blockNumber":"0xdcc0ca","transactionHash":"0x25fd06a5180e60beb4f1fd03ae61c3617ba0aaccbdd8a93f815ec5b53ce0f188","transactionIndex":"0x1","blockHash":"0x53ccf5e817446c489868d05b124b600bb80c7887c9a37569a3f6750be690e055","logIndex":"0x8","removed":false},{"address":"0xeb4c2781e4eba804ce9a9803c67d0893436bb27d","topics":["0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef","0x000000000000000000000000848ad4041397c1b75b50102efdde22bab8d5b4ab","0x000000000000000000000000d426be0576f6d8e1c805dcd3db3e4c1d8147406b"],"data":"0x0000000000000000000000000000000000000000000000000000000000a24eac","blockNumber":"0xdcc0ca","transactionHash":"0x25fd06a5180e60beb4f1fd03ae61c3617ba0aaccbdd8a93f815ec5b53ce0f188","transactionIndex":"0x1","blockHash":"0x53ccf5e817446c489868d05b124b600bb80c7887c9a37569a3f6750be690e055","logIndex":"0x9","removed":false},{"address":"0xeb4c2781e4eba804ce9a9803c67d0893436bb27d","topics":["0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925","0x000000000000000000000000848ad4041397c1b75b50102efdde22bab8d5b4ab","0x000000000000000000000000119c71d3bbac22029622cbaec24854d3d32d2828"],"data":"0xffffffffffffffffffffffffffffffffffffffffffffffffffffffff426478b2","blockNumber":"0xdcc0ca","transactionHash":"0x25fd06a5180e60beb4f1fd03ae61c3617ba0aaccbdd8a93f815ec5b53ce0f188","transactionIndex":"0x1","blockHash":"0x53ccf5e817446c489868d05b124b600bb80c7887c9a37569a3f6750be690e055","logIndex":"0xa","removed":false},{"address":"0xeb4c2781e4eba804ce9a9803c67d0893436bb27d","topics":["0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925","0x000000000000000000000000d426be0576f6d8e1c805dcd3db3e4c1d8147406b","0x0000000000000000000000007a250d5630b4cf539739df2c5dacb4c659f2488d"],"data":"0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff","blockNumber":"0xdcc0ca","transactionHash":"0x25fd06a5180e60beb4f1fd03ae61c3617ba0aaccbdd8a93f815ec5b53ce0f188","transactionIndex":"0x1","blockHash":"0x53ccf5e817446c489868d05b124b600bb80c7887c9a37569a3f6750be690e055","logIndex":"0xb","removed":false},{"address":"0xeb4c2781e4eba804ce9a9803c67d0893436bb27d","topics":["0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef","0x000000000000000000000000d426be0576f6d8e1c805dcd3db3e4c1d8147406b","0x00000000000000000000000081fbef4704776cc5bba0a5df3a90056d2c6900b3"],"data":"0x0000000000000000000000000000000000000000000000000000000000a24ef5","blockNumber":"0xdcc0ca","transactionHash":"0x25fd06a5180e60beb4f1fd03ae61c3617ba0aaccbdd8a93f815ec5b53ce0f188","transactionIndex":"0x1","blockHash":"0x53ccf5e817446c489868d05b124b600bb80c7887c9a37569a3f6750be690e055","logIndex":"0xc","removed":false},{"address":"0xeb4c2781e4eba804ce9a9803c67d0893436bb27d","topics":["0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925","0x000000000000000000000000d426be0576f6d8e1c805dcd3db3e4c1d8147406b","0x0000000000000000000000007a250d5630b4cf539739df2c5dacb4c659f2488d"],"data":"0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5db10a","blockNumber":"0xdcc0ca","transactionHash":"0x25fd06a5180e60beb4f1fd03ae61c3617ba0aaccbdd8a93f815ec5b53ce0f188","transactionIndex":"0x1","blockHash":"0x53ccf5e817446c489868d05b124b600bb80c7887c9a37569a3f6750be690e055","logIndex":"0xd","removed":false},{"address":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","topics":["0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef","0x00000000000000000000000081fbef4704776cc5bba0a5df3a90056d2c6900b3","0x000000000000000000000000d426be0576f6d8e1c805dcd3db3e4c1d8147406b"],"data":"0x000000000000000000000000000000000000000000000000141dd93efc76e9c0","blockNumber":"0xdcc0ca","transactionHash":"0x25fd06a5180e60beb4f1fd03ae61c3617ba0aaccbdd8a93f815ec5b53ce0f188","transactionIndex":"0x1","blockHash":"0x53ccf5e817446c489868d05b124b600bb80c7887c9a37569a3f6750be690e055","logIndex":"0xe","removed":false},{"address":"0x81fbef4704776cc5bba0a5df3a90056d2c6900b3","topics":["0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1"],"data":"0x0000000000000000000000000000000000000000000000041f64a39746404d4c0000000000000000000000000000000000000000000000000000000021cc1462","blockNumber":"0xdcc0ca","transactionHash":"0x25fd06a5180e60beb4f1fd03ae61c3617ba0aaccbdd8a93f815ec5b53ce0f188","transactionIndex":"0x1","blockHash":"0x53ccf5e817446c489868d05b124b600bb80c7887c9a37569a3f6750be690e055","logIndex":"0xf","removed":false},{"address":"0x81fbef4704776cc5bba0a5df3a90056d2c6900b3","topics":["0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822","0x0000000000000000000000007a250d5630b4cf539739df2c5dacb4c659f2488d","0x000000000000000000000000d426be0576f6d8e1c805dcd3db3e4c1d8147406b"],"data":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a24ef5000000000000000000000000000000000000000000000000141dd93efc76e9c00000000000000000000000000000000000000000000000000000000000000000","blockNumber":"0xdcc0ca","transactionHash":"0x25fd06a5180e60beb4f1fd03ae61c3617ba0aaccbdd8a93f815ec5b53ce0f188","transactionIndex":"0x1","blockHash":"0x53ccf5e817446c489868d05b124b600bb80c7887c9a37569a3f6750be690e055","logIndex":"0x10","removed":false},{"address":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","topics":["0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef","0x000000000000000000000000d426be0576f6d8e1c805dcd3db3e4c1d8147406b","0x000000000000000000000000a478c2975ab1ea89e8196811f51a7b7ade33eb11"],"data":"0x000000000000000000000000000000000000000000000000141dd27626580f58","blockNumber":"0xdcc0ca","transactionHash":"0x25fd06a5180e60beb4f1fd03ae61c3617ba0aaccbdd8a93f815ec5b53ce0f188","transactionIndex":"0x1","blockHash":"0x53ccf5e817446c489868d05b124b600bb80c7887c9a37569a3f6750be690e055","logIndex":"0x11","removed":false},{"address":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","topics":["0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef","0x000000000000000000000000d426be0576f6d8e1c805dcd3db3e4c1d8147406b","0x000000000000000000000000e4247779a6c198811a4d12c19188a9ab58f699a8"],"data":"0x000000000000000000000000000000000000000000000000000006c8d61eda68","blockNumber":"0xdcc0ca","transactionHash":"0x25fd06a5180e60beb4f1fd03ae61c3617ba0aaccbdd8a93f815ec5b53ce0f188","transactionIndex":"0x1","blockHash":"0x53ccf5e817446c489868d05b124b600bb80c7887c9a37569a3f6750be690e055","logIndex":"0x12","removed":false},{"address":"0xa478c2975ab1ea89e8196811f51a7b7ade33eb11","topics":["0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1"],"data":"0x0000000000000000000000000000000000000000000b2e11bfd84aaf71d376440000000000000000000000000000000000000000000000e84dcaf681c1cfa656","blockNumber":"0xdcc0ca","transactionHash":"0x25fd06a5180e60beb4f1fd03ae61c3617ba0aaccbdd8a93f815ec5b53ce0f188","transactionIndex":"0x1","blockHash":"0x53ccf5e817446c489868d05b124b600bb80c7887c9a37569a3f6750be690e055","logIndex":"0x13","removed":false},{"address":"0xa478c2975ab1ea89e8196811f51a7b7ade33eb11","topics":["0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822","0x000000000000000000000000d426be0576f6d8e1c805dcd3db3e4c1d8147406b","0x000000000000000000000000d426be0576f6d8e1c805dcd3db3e4c1d8147406b"],"data":"0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000141dd27626580f580000000000000000000000000000000000000000000000f72ec4520be414fdd00000000000000000000000000000000000000000000000000000000000000000","blockNumber":"0xdcc0ca","transactionHash":"0x25fd06a5180e60beb4f1fd03ae61c3617ba0aaccbdd8a93f815ec5b53ce0f188","transactionIndex":"0x1","blockHash":"0x53ccf5e817446c489868d05b124b600bb80c7887c9a37569a3f6750be690e055","logIndex":"0x14","removed":false}],"logsBloom":"0x00200000400000000000000080010000000000000000000000010000400004000000000000000000200000000000000002040000480000000800000000200000020000000200080000000008000000280000800010000000004000008000000010200040000080000000000000000000000000000000000010080010000000000000000000800000004000000000000004000000000000080000004000000008020000000000040000000020400000000000080000000000000200000000000000000002000000000000200080400000000002000400001000000000000020000010200000000000000000000000000000000000000000000000000000000000","status":"0x1","to":"0xd426be0576f6d8e1c805dcd3db3e4c1d8147406b","transactionHash":"0x25fd06a5180e60beb4f1fd03ae61c3617ba0aaccbdd8a93f815ec5b53ce0f188","transactionIndex":"0x1","type":"0x2"}}
 
     if(responseJson.result != null) // this is a transaction hash on ETH, if not it's an order hash or it's a transaction hash on another chain.
@@ -417,7 +425,7 @@ async function parseHash(hash: string)
     let orderHashData = await getOrderHashData(hash);
     if(orderHashData != null)
     {
-        console.log("orderHashData: " + JSON.stringify(orderHashData));
+        // console.log("orderHashData: " + JSON.stringify(orderHashData));
         //this means we have a transaction hash available so we can collect the rest of the data by calling this function again with a transaction hash.
         for(let i=0; i<orderHashData.length; i++)
         {
@@ -583,3 +591,42 @@ OR
 
 */
 
+function parsePermit(permit: string | undefined) {
+    if(permit === undefined)
+        return undefined;
+    // else
+    if(permit.length == 490)
+    {
+    // index 0 to 42 is the token being permitted
+    const token = permit.substring(0,42);
+    // index 42+23 to 42+23+40 is the owner of the permit
+    const owner = '0x'+permit.substring(43+23,43+23+40);
+    // index 42+23+40+24 to 42+23+40+24+40 is the spender of the permit
+    const spender = '0x'+permit.substring(43+23+40+24,43+23+40+24+40);
+    // index 42+23+40+24+40 to 42+23+40+24+40+64 is the amount of the permit
+    const amount = '0x'+permit.substring(43+23+40+24+40,43+23+40+24+40+64);
+    // index 42+23+40+24+40+64 to 42+23+40+24+40+64+64 is the deadline (expiry) of the permit
+    const deadline = new Date(parseInt('0x'+permit.substring(43+23+40+24+40+64,43+23+40+24+40+64+64)) * 1000);
+    // nonce must be gotten from calling the contract
+    // const nonce = ...
+    return {token, owner, spender, amount, deadline};
+    }
+    else //if(permit.length == 554)
+    {
+        // if the nonce is included, then the amount comes after the deadline
+         // index 0 to 42 is the token being permitted
+    const token = permit.substring(0,42);
+    // index 42+23 to 42+23+40 is the owner of the permit
+    const owner = '0x'+permit.substring(43+23,43+23+40);
+    // index 42+23+40+24 to 42+23+40+24+40 is the spender of the permit
+    const spender = '0x'+permit.substring(43+23+40+24,43+23+40+24+40);
+    // index 42+23+40+24+40 to 42+23+40+24+40+64 is the nonce of the permit
+    const nonce = parseInt('0x'+permit.substring(43+23+40+24+40,43+23+40+24+40+64));
+    // index 42+23+40+24+40+64 to 42+23+40+24+40+64+64 is the deadline (expiry) of the permit
+    const deadline = new Date(parseInt('0x'+permit.substring(43+23+40+24+40+64,43+23+40+24+40+64+64)) * 1000);
+    // index 42+23+40+24+40+64+64 to 42+23+40+24+40+64+64+64 is if the allowance is allowed, if it's a 1 then infinite is allowed, else it's 0
+    const amount = parseInt('0x'+permit.substring(43+23+40+24+40+64+64,43+23+40+24+40+64+64+64)) == 1 ? '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' : '0x0';
+    return {token, owner, spender, amount, deadline, nonce};
+    }
+
+}
