@@ -108,7 +108,7 @@ function getLocalTokenInfo(token:string)
         let tokens = JSON.parse(localStorage["tokens"]);
         if(tokens.hasOwnProperty(token))
         {
-            console.log(tokens[token]);
+            // console.log(tokens[token]);
             tokenInfo = tokens[token];
         }
     }

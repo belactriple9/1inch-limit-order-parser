@@ -230,3 +230,15 @@ input {
     margin: 0 auto;
     color: white;
   }
+
+  @media (max-width:500px)
+  {
+    .json-output
+    {
+      max-width: 100%;
+    }
+
+    .wrap-collapsible{
+      max-width: 100%;
+    }
+  }
